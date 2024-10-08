@@ -1,12 +1,24 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+const { verifyToken } = require("../helpers/jwt");
 
-exports.authenticateToken = (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1];
-  if (!token) return res.sendStatus(401);
+const authentication = async (req, res, next) => {
+  try {
+    if(!req.headers.authorization) throw { name: "Unauthorized" };
+    
+    let [bearer, token] = req.headers.authorization?.split(" ");
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
+    if (!token || bearer !== "Bearer") throw { name: "Unauthorized" };
+
+    const verify = verifyToken(token, process.env.JWT_SECRET);
+
+    req.user = {
+        id : verify.id
+    };
+
     next();
-  });
+  } catch (error) {
+    next(error);
+  }
 };
+
+module.exports = authentication

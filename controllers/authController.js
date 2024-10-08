@@ -5,42 +5,41 @@ const jwt = require("jsonwebtoken");
 
 exports.register = register = async (req, res) => {
   try {
-    const { email, passseod } = req.body;
-    const hashedPassword = await bcrypt.hashSync(passseod, 10);
+    const { email, password } = req.body;
+
+    password = await bcrypt.hashSync(password, 10);
     const user = await User.create({
       email,
-      password: hashedPassword,
+      password,
     });
+
     res.status(201).json({
       id: user.id,
       email: user.email,
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Internal server error",
-    });
+    next(error)
   }
 };
 
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    if(!email) throw {name : "Email is required"};
+    if(!password) throw {name : "Password is required"};
+    
+
+
     const user = await User.findOne({ where: { email } });
-    if (!user) {
-      return res.status(401).json({
-        message: "Invalid email or password",
-      });
-    }
+    if (!user) throw {name: "InvalidEmail/Password"}
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        message: "Invalid email or password",
-      });
-    }
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
+    if (!isPasswordValid) throw {name: "InvalidEmail/Password"}
+
+    const access_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
     res.status(200).json({
-      message: "Login successful",
-      token,
+      access_token
     });
   } catch (error) {
     res.status(500).json({
