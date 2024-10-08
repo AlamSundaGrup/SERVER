@@ -1,18 +1,55 @@
+const { comparePassword } = require("../helpers/bycrypt");
+const { createToken } = require("../helpers/jwt");
 const { User } = require("../models");
-// const { comparePassword, hashPassword } = require("../helpers/bcrypt");
-
 const { OAuth2Client } = require("google-auth-library");
-// const { where } = require("sequelize");
-// const { signToken, verifyToken } = require("../helpers/jwt");
-// const { imgbox } = require("imgbox");
-
 const client = new OAuth2Client();
 
 class UserController {
+  static async register(req, res, next) {
+    try {
+      const { email, password } = req.body;
+      const newUser = await User.create({
+        email,
+        password,
+      });
+
+      res.status(201).json({
+        id: newUser.id,
+        email: newUser.email
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async login(req, res, next) {
+    try {
+      const { email, password } = req.body;
+
+      if(!email) throw { name: "Email is required" };
+      if(!password) throw { name: "Password is required" };
+
+      const user = await User.findOne({ where: { email } });
+      if (!user) throw { name: "Invalid email or password" };
+
+      const isPasswordValid = await comparePassword(password, user.password);
+      if (!isPasswordValid) throw { name: "Invalid email or password" };
+      
+      const payload = {
+        id: user.id
+      };
+
+      const access_token = createToken(payload);
+
+      res.status(200).json({ access_token });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async googleLogin(req, res, next) {
     try {
       const { google_token } = req.headers;
-      console.log(google_token);
 
       const ticket = await client.verifyIdToken({
         idToken: google_token,
@@ -20,8 +57,6 @@ class UserController {
       });
       const payload = ticket.getPayload();
 
-      //   cek ke db sendiri apakah user tersebutsudah terdaftar apa belom?
-      //    kalau belom kita daftarin dulu, lalu lanjut login
       const [user, created] = await User.findOrCreate({
         where: { email: payload.email },
         defaults: {
@@ -30,13 +65,10 @@ class UserController {
           password: String(Math.random() * 10000),
         },
       });
-      //   kalau udah, lanjut login (generate token jwt biasa)
+
       const access_token = signToken({ id: user.id });
-      console.log(user, created);
-      res.status(200).json({ access_token });
-      //   const userId = payload["sub"];
+      res.json({ access_token });
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -44,7 +76,6 @@ class UserController {
   static async getProfileByToken(req, res, next) {
     try {
       const { token } = req.params;
-      console.log("Token from params:", token);
 
       const payload = verifyToken(token);
       const user = await User.findByPk(payload.id);
@@ -52,7 +83,7 @@ class UserController {
         return res.status(404).json({ message: "User not found" });
       }
 
-      res.status(200).json({
+      res.json({
         userName: user.userName,
         email: user.email,
         profilePicture: user.profilePicture,

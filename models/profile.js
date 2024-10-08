@@ -36,10 +36,10 @@ module.exports = (sequelize, DataTypes) => {
       type:DataTypes.INTEGER,
       validate:{
         notEmpty:{
-          msg:"userId is required"
+          msg:"User ID is required"
         },
         notNull:{
-          msg:"userId is required"
+          msg:"User ID is required"
         }
       },
       references:{

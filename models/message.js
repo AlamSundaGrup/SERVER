@@ -19,10 +19,10 @@ module.exports = (sequelize, DataTypes) => {
       type:DataTypes.INTEGER,
       validate:{
         notEmpty:{
-          msg:"profileId is required"
+          msg:"Profile ID is required"
         },
         notNull:{
-          msg:"profileId is required"
+          msg:"Profile ID is required"
         }
       },
       references:{
@@ -34,10 +34,10 @@ module.exports = (sequelize, DataTypes) => {
       type:DataTypes.STRING,
       validate:{
         notEmpty:{
-          msg:"message is required"
+          msg:"Message is required"
         },
         notNull:{
-          msg:"message is required"
+          msg:"Message is required"
         }
       }
     }

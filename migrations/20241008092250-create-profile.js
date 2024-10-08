@@ -14,8 +14,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       profilePicture: {
-        type: Sequelize.STRING,
-        defaultValue: "https://cdn.pixabay.com/photo/2021/07/25/08/03/account-6491185_1280.png"
+        type: Sequelize.STRING
       },
       userId: {
         allowNull: false,

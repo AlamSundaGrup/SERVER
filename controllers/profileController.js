@@ -1,33 +1,54 @@
-const { Profile } = require('../models');
+const { Profile } = require("../models");
 
-exports.createProfile = async (req, res) => {
-  try {
-    const { displayName, profilePicture, UserId } = req.body;
-    const profile = await Profile.create({ displayName, profilePicture, UserId });
+class ProfileController {
+  static async createProfile(req, res, next) {
+    try {
+      const { displayName, profilePicture, UserId } = req.body;
+      const newProfile = await Profile.create({
+        displayName,
+        profilePicture,
+        UserId,
+      });
 
-    res.status(201).json(profile);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-exports.getProfiles = async (req, res) => {
-  try {
-    const profiles = await Profile.findAll();
-    res.status(200).json(profiles);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-exports.getProfileById = async (req, res) => {
-  try {
-    const profile = await Profile.findByPk(req.params.id);
-    if (!profile) {
-      return res.status(404).json({ message: "Profile not found" });
+      res.status(201).json(newProfile);
+    } catch (error) {
+      next(error);
     }
-    res.status(200).json(profile);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
-};
+
+  static async getProfiles(req, res, next) {
+    try {
+      const profiles = await Profile.findAll();
+      res.status(200).json(profiles);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getProfileById(req, res, next) {
+    try {
+      const profile = await Profile.findByPk(req.params.id);
+      if (!profile) throw { name: "ProfileNotFound" };
+
+      res.status(200).json(profile);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updateProfile(req, res, next) {
+    try {
+      const { displayName, profilePicture } = req.body;
+
+      const profile = await Profile.findByPk(req.params.id);
+      if (!profile) throw { name: "NotFound" };
+
+      await Profile.update({ displayName, profilePicture });
+      res.status(200).json(profile);
+    } catch (error) {
+      next(error);
+    }
+  }
+}
+
+module.exports = ProfileController;
