@@ -1,0 +1,17 @@
+[
+    {
+        "displayName": "user1@mail.com",
+        "profilePicture": "https://cdn.pixabay.com/photo/2021/07/25/08/03/account-6491185_1280.png",
+        "userId": 1
+    },
+    {
+        "displayName": "user2@mail.com",
+        "profilePicture": "https://cdn.pixabay.com/photo/2020/09/16/15/05/man-5576603_1280.jpg",
+        "userId": 2
+    },
+    {
+        "displayName": "user3@mail.com",
+        "profilePicture": "https://cdn.pixabay.com/photo/2020/10/11/19/51/cat-5646889_1280.jpg",
+        "userId": 2
+    }
+]
