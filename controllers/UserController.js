@@ -1,4 +1,5 @@
 require("dotenv").config();
+const { where } = require("sequelize");
 const { comparePassword } = require("../helpers/bycrypt");
 const { createToken, verifyToken } = require("../helpers/jwt");
 const { User } = require("../models");
@@ -48,11 +49,11 @@ class UserController {
       next(error);
     }
   }
-
+  
   static async googleLogin(req, res, next) {
     try {
       const { google_token } = req.headers;
-
+      
       const ticket = await client.verifyIdToken({
         idToken: google_token,
         audience: process.env.GOOGLE_CLIENT_ID,
@@ -68,7 +69,7 @@ class UserController {
         },
         hooks: false,
       });
-
+      
       const access_token = await createToken({ id: user.id });
       res.json({ access_token });
     } catch (error) {
@@ -76,20 +77,18 @@ class UserController {
     }
   }
 
-  static async getProfileByToken(req, res, next) {
+  static async validateProfile(req, res, next) {
     try {
-      const { token } = req.params;
+      const { id } = req.user;
 
-      const payload = verifyToken(token);
-      const user = await User.findByPk(payload.id);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
+      const profile = await Profile.findOne({where: { UserId: id }});
+      if (!profile) {
+        return res.json({ message: "Profile not found, please create your profile first" });
       }
 
       res.json({
-        userName: user.userName,
-        email: user.email,
-        profilePicture: user.profilePicture,
+        displayName: profile.displayName,
+        profilePicture: profile.profilePicture,
       });
     } catch (error) {
       next(error);

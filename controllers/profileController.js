@@ -3,13 +3,14 @@ const { Profile } = require("../models");
 class ProfileController {
   static async createProfile(req, res, next) {
     try {
-let { id } = req.user;
+      let { id } = req.user;
 
       const { displayName, profilePicture } = req.body;
+
       const newProfile = await Profile.create({
         displayName,
         profilePicture,
-        UserId : id,
+        UserId: id,
       });
 
       res.status(201).json(newProfile);
