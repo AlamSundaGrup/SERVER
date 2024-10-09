@@ -11,12 +11,13 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      User.hasOne(models.user);
+      User.hasOne(models.Profile, { foreignKey: "UserId" });
     }
   }
   User.init(
     {
       email: {
+        allowNull: false,
         type: DataTypes.STRING,
         unique: {
           msg: "Email already exist",
@@ -30,10 +31,11 @@ module.exports = (sequelize, DataTypes) => {
           },
           isEmail: {
             msg: "Invalid email format",
-          }
+          },
         },
       },
       password: {
+        allowNull: false,
         type: DataTypes.STRING,
         validate: {
           notEmpty: {
@@ -51,7 +53,7 @@ module.exports = (sequelize, DataTypes) => {
       hooks: {
         beforeCreate: async (user, options) => {
           if (user.password) {
-            user.password = hashPassword(user.password)
+            user.password = await hashPassword(user.password);
           }
         },
       },

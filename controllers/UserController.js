@@ -1,6 +1,8 @@
+require("dotenv").config();
 const { comparePassword } = require("../helpers/bycrypt");
-const { createToken } = require("../helpers/jwt");
+const { createToken, verifyToken } = require("../helpers/jwt");
 const { User } = require("../models");
+const { Profile } = require("../models");
 const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client();
 
@@ -15,7 +17,7 @@ class UserController {
 
       res.status(201).json({
         id: newUser.id,
-        email: newUser.email
+        email: newUser.email,
       });
     } catch (error) {
       next(error);
@@ -26,20 +28,20 @@ class UserController {
     try {
       const { email, password } = req.body;
 
-      if(!email) throw { name: "Email is required" };
-      if(!password) throw { name: "Password is required" };
+      if (!email) throw { name: "Email is required" };
+      if (!password) throw { name: "Password is required" };
 
       const user = await User.findOne({ where: { email } });
       if (!user) throw { name: "Invalid email or password" };
 
       const isPasswordValid = await comparePassword(password, user.password);
       if (!isPasswordValid) throw { name: "Invalid email or password" };
-      
+
       const payload = {
-        id: user.id
+        id: user.id,
       };
 
-      const access_token = createToken(payload);
+      const access_token = await createToken(payload);
 
       res.status(200).json({ access_token });
     } catch (error) {
@@ -64,9 +66,10 @@ class UserController {
           email: payload.email,
           password: String(Math.random() * 10000),
         },
+        hooks: false,
       });
 
-      const access_token = signToken({ id: user.id });
+      const access_token = await createToken({ id: user.id });
       res.json({ access_token });
     } catch (error) {
       next(error);
