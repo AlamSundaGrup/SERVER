@@ -1,24 +1,32 @@
+const { verifyToken } = require("../helpers/jwt");
 const { Message } = require("../models");
 
 class MessageController {
-  static async createMessage(req, res, next) {
+  static async createMessage(message, token) {
     try {
-      const { message, ProfileId } = req.body;
-      const newMessage = await Message.create({ message, ProfileId });
+      const res = verifyToken(token);
 
-      res.status(201).json(newMessage);
+      let currentUser = await User.findOne({
+        where: {
+          email: res.email,
+        },
+      });
+
+      let ProfileId = currentUser.id;
+
+      const newMessage = await Message.create({ message, ProfileId });
     } catch (error) {
-      next(error);
+      console.log(error);
     }
   }
 
-  static async getMessages(req, res, next) {
+  static async getMessages() {
     try {
       const messages = await Message.findAll();
 
-      res.status(200).json(messages);
+      return messages;
     } catch (error) {
-      next(error);
+      console.log(error);
     }
   }
 }

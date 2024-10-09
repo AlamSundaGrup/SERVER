@@ -1,21 +1,23 @@
-const { verifyToken } = require("../helpers/jwt")
+const { verifyToken } = require("../helpers/jwt");
 
 function authentication(req, res, next) {
-    try {
-        if(!req.headers.authorization) throw {name : "Unauthorized"}
-        const [bearer, token] = req.headers.authorization?.split(" ")
+  try {
+    console.log("---");
 
-        const verify = verifyToken(token)
-        if(!verify) throw {name : "Unauthorized"}
+    if (!req.headers.authorization) throw { name: "Unauthorized" };
+    const [bearer, token] = req.headers.authorization?.split(" ");
+    console.log("<<<<<<<");
 
-        req.user = {
-            id : verify.id
-        }
-        next()
-    } catch (error) {
-        next(error)
-    }
+    const verify = verifyToken(token);
+    if (!verify) throw { name: "Unauthorized" };
+
+    req.user = {
+      id: verify.id,
+    };
+    next();
+  } catch (error) {
+    next(error);
+  }
 }
 
-
-module.exports = authentication
+module.exports = authentication;
