@@ -33,13 +33,14 @@ io.on("connection", (socket) => {
     io.emit("globalMessage", `Someone said: ${message}`);
   });
 
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-    io.emit("userLeft", "A user has left the chat");
-  });
+  // socket.on("disconnect", () => {
+  //   console.log("User disconnected");
+  //   io.emit("userLeft", "A user has left the chat");
+  // });
 });
 
 httpServer.listen(3000);
+  console.log(`Server is listening on port ${port}`);
 
 // app.listen(port, () => {
 //   console.log(`Server is listening on port ${port}`);

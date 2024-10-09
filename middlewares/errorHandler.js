@@ -7,6 +7,7 @@ const errorHandler = (err, req, res, next) => {
   switch (err.name) {
     case "SequelizeValidationError":
     case "SequelizeUniqueConstraintError":
+    case "SequelizeForeignKeyConstraintError":
       statusCode = 400;
       message = err.errors[0].message;
       break;

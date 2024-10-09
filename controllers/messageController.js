@@ -1,16 +1,15 @@
 const { verifyToken } = require("../helpers/jwt");
-const { Message } = require("../models");
+const { Message, User } = require("../models");
 
 class MessageController {
   static async createMessage(message, token) {
     try {
       const res = verifyToken(token);
 
-      let currentUser = await User.findOne({
-        where: {
-          email: res.email,
-        },
-      });
+      console.log(res, "<<<<<<<<");
+      
+
+      let currentUser = await User.findByPk(res.id);
 
       let ProfileId = currentUser.id;
 
