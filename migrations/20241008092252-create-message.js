@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      profileId: {
+      ProfileId: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references:{

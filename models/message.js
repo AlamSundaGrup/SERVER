@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Message extends Model {
     /**
@@ -11,39 +9,44 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Message.belongsTo(models.profile, {foreignKey:"profileId"})
+      Message.belongsTo(models.Profile, { foreignKey: "ProfileId" });
     }
   }
-  Message.init({
-    profileId: {
-      type:DataTypes.INTEGER,
-      validate:{
-        notEmpty:{
-          msg:"Profile ID is required"
+  Message.init(
+    {
+      ProfileId: {
+        allowNull: false,
+        type: DataTypes.INTEGER,
+        validate: {
+          notEmpty: {
+            msg: "Profile ID is required",
+          },
+          notNull: {
+            msg: "Profile ID is required",
+          },
         },
-        notNull:{
-          msg:"Profile ID is required"
-        }
+        references: {
+          model: "Profiles",
+          key: "id",
+        },
       },
-      references:{
-        model: "Profiles",
-        key: "id"
-      }
-    },
-    message: {
-      type:DataTypes.STRING,
-      validate:{
-        notEmpty:{
-          msg:"Message is required"
+      message: {
+        allowNull: false,
+        type: DataTypes.STRING,
+        validate: {
+          notEmpty: {
+            msg: "Message is required",
+          },
+          notNull: {
+            msg: "Message is required",
+          },
         },
-        notNull:{
-          msg:"Message is required"
-        }
-      }
+      },
+    },
+    {
+      sequelize,
+      modelName: "Message",
     }
-  }, {
-    sequelize,
-    modelName: 'Message',
-  });
+  );
   return Message;
 };
