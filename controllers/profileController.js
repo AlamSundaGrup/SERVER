@@ -20,7 +20,12 @@ let { id } = req.user;
 
   static async getProfiles(req, res, next) {
     try {
-      const profiles = await Profile.findAll();
+      const profiles = await Profile.findAll({
+        include: {
+          model: User,
+          attributes: ["email"],
+        },
+      });
       res.status(200).json(profiles);
     } catch (error) {
       next(error);
