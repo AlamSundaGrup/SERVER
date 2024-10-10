@@ -25,18 +25,13 @@ const io = new Server(httpServer, {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  socket.on("send-message", ({ message, token }) => {
-    console.log(message, "ini di server");
+  socket.on("send-message", async ({ message, token }) => {
 
-    let response = MessageController.createMessage(message, token);
-
-    io.emit("globalMessage", `Someone said: ${message}`);
+    await MessageController.createMessage(message, token);
+    let messages = await MessageController.getMessages();
+    
+    io.emit("globalMessage",messages);
   });
-
-  // socket.on("disconnect", () => {
-  //   console.log("User disconnected");
-  //   io.emit("userLeft", "A user has left the chat");
-  // });
 });
 
 httpServer.listen(3000);

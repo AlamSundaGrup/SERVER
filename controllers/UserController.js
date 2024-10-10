@@ -1,4 +1,5 @@
 require("dotenv").config();
+const { where } = require("sequelize");
 const { comparePassword } = require("../helpers/bycrypt");
 const { createToken, verifyToken } = require("../helpers/jwt");
 const { User } = require("../models");
@@ -76,21 +77,32 @@ class UserController {
     }
   }
 
-  static async getProfileByToken(req, res, next) {
+  static async validateProfile(req, res, next) {
     try {
-      const { token } = req.params;
+      const { id } = req.user;
 
-      const payload = verifyToken(token);
-      const user = await User.findByPk(payload.id);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
+      const profile = await Profile.findOne({
+        where: { UserId: id },
+      });
+      if (!profile)
+        throw { name: "Profile not found, please create your profile first" };
 
       res.json({
-        userName: user.userName,
-        email: user.email,
-        profilePicture: user.profilePicture,
+        id: profile.id,
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async validateUser(req, res, next) {
+    try {
+      const { id } = req.user;
+
+      const user = await User.findByPk(id);
+      if (!user) res.json({ message: "User not found" });
+
+      res.json({ id: user.id });
     } catch (error) {
       next(error);
     }
