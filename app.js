@@ -1,8 +1,9 @@
-require("dotenv").config();
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 const express = require("express");
 const router = require("./routers");
 const app = express();
-const port = process.env.PORT;
 
 const cors = require("cors");
 const { createServer } = require("http");
@@ -26,17 +27,16 @@ io.on("connection", (socket) => {
   console.log("A user connected");
 
   socket.on("send-message", async ({ message, token }) => {
-
     await MessageController.createMessage(message, token);
     let messages = await MessageController.getMessages();
-    
-    io.emit("globalMessage",messages);
+
+    io.emit("globalMessage", messages);
   });
 });
 
-httpServer.listen(3000);
-  console.log(`Server is listening on port ${port}`);
 
 // app.listen(port, () => {
 //   console.log(`Server is listening on port ${port}`);
 // });
+
+module.exports = app
