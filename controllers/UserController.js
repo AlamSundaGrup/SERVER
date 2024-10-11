@@ -80,12 +80,11 @@ class UserController {
   static async validateProfile(req, res, next) {
     try {
       const { id } = req.user;
-
+      
       const profile = await Profile.findOne({
         where: { UserId: id },
       });
-      if (!profile)
-        throw { name: "Profile not found, please create your profile first" };
+      if (!profile) res.json({ message: "Profile not found, please create your profile first" });
 
       res.json({
         id: profile.id,
