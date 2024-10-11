@@ -19,7 +19,7 @@ app.use(router);
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "*",
   },
 });
 
@@ -33,10 +33,5 @@ io.on("connection", (socket) => {
     io.emit("globalMessage", messages);
   });
 });
-
-
-// app.listen(port, () => {
-//   console.log(`Server is listening on port ${port}`);
-// });
 
 module.exports = app
